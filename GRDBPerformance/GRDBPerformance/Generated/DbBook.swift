@@ -38,13 +38,13 @@ public struct DbBook: FetchableRecord, PersistableRecord, Codable {
 
     public func genInsert(db: Database) throws {
         let statement = try db.cachedUpdateStatement(sql: Self.insert_unique_query)
-        let values = [
-            bookUuid.uuidString.databaseValue,
-            userUuid?.uuidString.databaseValue ?? .null,
-            integerOptional?.databaseValue ?? .null,
+        let arguments: StatementArguments = [
+            bookUuid.uuidString,
+            userUuid?.uuidString,
+            integerOptional,
         ]
 
-        statement.setUncheckedArguments(StatementArguments(values: values))
+        statement.setUncheckedArguments(arguments)
 
         try statement.execute()
 
@@ -54,13 +54,13 @@ public struct DbBook: FetchableRecord, PersistableRecord, Codable {
 
     public func genUpdate(db: Database) throws {
         let statement = try db.cachedUpdateStatement(sql: Self.update_unique_query)
-        let values = [
-            userUuid?.uuidString.databaseValue ?? .null,
-            integerOptional?.databaseValue ?? .null,
-            bookUuid.uuidString.databaseValue,
+        let arguments: StatementArguments = [
+            userUuid?.uuidString,
+            integerOptional,
+            bookUuid.uuidString,
         ]
 
-        statement.setUncheckedArguments(StatementArguments(values: values))
+        statement.setUncheckedArguments(arguments)
 
         try statement.execute()
 
@@ -87,9 +87,9 @@ public struct DbBookPrimaryKey {
     public func genSelect(db: Database) throws -> DbBook? {
         let statement = try db.cachedSelectStatement(sql: Self.select_query)
 
-        statement.setUncheckedArguments(StatementArguments(values: [
-            bookUuid.uuidString.databaseValue,
-        ]))
+        statement.setUncheckedArguments([
+            bookUuid.uuidString,
+        ])
 
         return try DbBook.fetchOne(statement)
     }
@@ -105,13 +105,13 @@ public struct DbBookPrimaryKey {
 
     // Deletes a unique row, asserts that the row actually existed
     public func genDelete(db: Database) throws {
-        let values = [
-            bookUuid.uuidString.databaseValue,
+        let arguments: StatementArguments = [
+            bookUuid.uuidString,
         ]
 
         let statement = try db.cachedUpdateStatement(sql: Self.delete_query)
 
-        statement.setUncheckedArguments(StatementArguments(values: values))
+        statement.setUncheckedArguments(arguments)
 
         try statement.execute()
 
